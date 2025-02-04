@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitoring</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #00796b;
+            color: white;
+            padding: 20px 0;
+        }
+        h1 {
+            margin: 0;
+        }
+        .sensor-data {
+            margin-top: 50px;
+            font-size: 1.2em;
+        }
+        .sensor-box {
+            display: inline-block;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 250px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .sensor-box p {
+            margin: 10px 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+        .sensor-box span {
+            font-size: 1em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Real-Time Air Quality Monitoring</h1>
+    </header>
+    <div class="sensor-data">
+        <div id="sensorData"></div>
+    </div>
+
+    <script>
+        function fetchData() {
+            const url = "https://api.thingspeak.com/channels/2642673/feeds.json?results=1";
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const feed = data.feeds[0]; // Latest data feed
+                    const sensorData = `
+                        <div class="sensor-box">
+                            <p>${feed.field1 || 'N/A'} <span>µg/m³ (PM2.5)</span></p>
+                        </div>
+                        <div class="sensor-box">
+                            <p>${feed.field2 || 'N/A'} <span>ppm (CO)</span></p>
+                        </div>
+                        <div class="sensor-box">
+                            <p>${feed.field3 || 'N/A'} <span>ppb (Ozone)</span></p>
+                        </div>
+                    `;
+                    document.getElementById("sensorData").innerHTML = sensorData;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Fetch data every 15 seconds
+        setInterval(fetchData, 15000);
+        fetchData();  // Initial data fetch
+    </script>
+</body>
+</html>
